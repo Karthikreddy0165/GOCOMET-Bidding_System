@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Database Schema Design · British Reverse Auction System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card: #111827;
+      --card-inner: #162032;
+      --border: #1f293d;
+      --border-light: #2d3b55;
+      --text: #94a3b8;
+      --text-bright: #f8fafc;
+      --text-muted: #64748b;
+      --blue: #38bdf8;
+      --indigo: #818cf8;
+      --emerald: #34d399;
+      --amber: #fbbf24;
+      --rose: #fb7185;
+      --font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(11, 15, 25, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px clamp(16px, 4vw, 48px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-bright);
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 800;
+      font-size: 13px;
+    }
+    .nav {
+      display: flex;
+      gap: 8px;
+    }
+    .nav a {
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      color: var(--text-muted);
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+    }
+    .nav a:hover {
+      color: var(--text-bright);
+      background: var(--card);
+    }
+    .nav a.active {
+      color: var(--blue);
+      background: rgba(56, 189, 248, 0.1);
+      border-color: rgba(56, 189, 248, 0.25);
+    }
+
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 48px clamp(16px, 4vw, 48px) 80px;
+    }
+
+    .hero {
+      margin-bottom: 48px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 36px;
+    }
+    .kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      color: var(--blue);
+      font-size: 11px;
+      font-weight: 700;
+      font-family: var(--mono);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .hero h1 {
+      font-size: clamp(32px, 5vw, 44px);
+      font-weight: 800;
+      color: var(--text-bright);
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 14px;
+    }
+    .hero p {
+      font-size: 16px;
+      color: var(--text);
+      max-width: 820px;
+      line-height: 1.6;
+    }
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .hero-meta strong {
+      color: var(--text-bright);
+    }
+
+    .section-head {
+      margin-bottom: 24px;
+    }
+    .section-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-bright);
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+    .section-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      color: var(--blue);
+      font-size: 12px;
+      font-family: var(--mono);
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+    }
+    .section-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .diagram-frame {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 48px;
+    }
+    .diagram-bar {
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-family: var(--mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .diagram-body {
+      padding: 24px 16px;
+      overflow-x: auto;
+      display: flex;
+      justify-content: center;
+    }
+    .diagram-body svg {
+      width: 100%;
+      max-width: 1100px;
+      height: auto;
+      display: block;
+    }
+
+    .spec-group {
+      margin-bottom: 48px;
+    }
+    .spec-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    .spec-header {
+      padding: 14px 20px;
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .spec-title {
+      font-family: var(--mono);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--blue);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .spec-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th {
+      text-align: left;
+      padding: 10px 20px;
+      background: rgba(11, 15, 25, 0.4);
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    td {
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255, 255, 255, 0.02); }
+    .col-name {
+      font-family: var(--mono);
+      font-weight: 600;
+      color: var(--text-bright);
+    }
+    .col-type {
+      font-family: var(--mono);
+      color: #38bdf8;
+      font-size: 12px;
+    }
+    .pill {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      font-family: var(--mono);
+      margin-right: 4px;
+    }
+    .pill-pk { background: rgba(56, 189, 248, 0.15); color: var(--blue); border: 1px solid rgba(56, 189, 248, 0.3); }
+    .pill-fk { background: rgba(129, 140, 248, 0.15); color: var(--indigo); border: 1px solid rgba(129, 140, 248, 0.3); }
+    .pill-uq { background: rgba(251, 191, 36, 0.15); color: var(--amber); border: 1px solid rgba(251, 191, 36, 0.3); }
+    .pill-req { background: rgba(251, 113, 133, 0.15); color: var(--rose); border: 1px solid rgba(251, 113, 133, 0.3); }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 48px;
+    }
+    @media (max-width: 840px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+    .note-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px;
+    }
+    .note-tag {
+      font-size: 11px;
+      font-family: var(--mono);
+      font-weight: 700;
+      color: var(--blue);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .note-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-bright);
+      margin-bottom: 10px;
+    }
+    .note-body {
+      font-size: 13.5px;
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="topbar">
+    <a href="#" class="brand">
+      <div class="brand-mark">B</div>
+      <span>British Reverse Auction RFQ</span>
+    </a>
+    <nav class="nav">
+      <a href="hld.html">High-Level Design</a>
+      <a href="schema_design.html" class="active">Schema Design</a>
+    </nav>
+  </header>
+
+  <div class="wrap">
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="kicker">DATA ARCHITECTURE · RELATIONAL SCHEMA</div>
+      <h1>Schema Design</h1>
+      <p>
+        Eight relational tables model users and Role-Based Access Control (RBAC), freight RFQs, British auction room configurations, supplier quotes, and an immutable audit trail.
+      </p>
+      <div class="hero-meta">
+        <span>Access Control: <strong>RBAC on users table (BUYER | SUPPLIER | ADMIN)</strong></span>
+        <span>Storage Engine: <strong>PostgreSQL / SQLAlchemy</strong></span>
+        <span>Audit Trail: <strong>Append-Only Event Log</strong></span>
+      </div>
+    </div>
+
+    <!-- Section 1: Entity Relationship Diagram with Multiplicity -->
+    <div class="section-head">
+      <div class="section-title">
+        <span class="section-num">1</span>
+        <h2>Entity-Relationship Map with Multiplicity</h2>
+      </div>
+      <p class="section-desc">
+        Relational model showing foreign keys, RBAC roles, and explicit relationship multiplicities.
+      </p>
+    </div>
+
+    <div class="diagram-frame">
+      <div class="diagram-bar">Relational Model · Explicit Multiplicities (1:1, 1:N)</div>
+      <div class="diagram-body">
+        <svg viewBox="0 0 1080 600" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L8,3 z" fill="#64748b"/>
+            </marker>
+          </defs>
+
+          <!-- 1. users -->
+          <g transform="translate(30, 40)">
+            <rect width="210" height="150" rx="6" fill="#111827" stroke="#1f293d" stroke-width="1.5"/>
+            <rect width="210" height="28" rx="6" fill="#162032"/>
+            <text x="12" y="19" fill="#f8fafc" font-family="'JetBrains Mono'" font-weight="700" font-size="12">users (RBAC Core)</text>
+            <text x="12" y="48" fill="#38bdf8" font-family="'JetBrains Mono'" font-size="11">PK id : integer</text>
+            <text x="12" y="68" fill="#94a3b8" font-family="'JetBrains Mono'" font-size="11">email : varchar UQ</text>
+            <text x="12" y="88" fill="#34d399" font-family="'JetBrains Mono'" font-weight="700" font-size="11">role : BUYER|SUPPLIER</text>
+            <text x="12" y="108" fill="#94a3b8" font-family="'JetBrains Mono'" font-size="11">company_name : varchar</text>
+            <text x="12" y="128" fill="#64748b" font-family="'JetBrains Mono'" font-size="11">created_at : timestamp</text>
+          </g>
+
+          <!-- 2. rfqs -->
+          <g transform="translate(310, 40)">
+            <rect width="230" height="170" rx="6" fill="#111827" stroke="#1f293d" stroke-width="1.5"/>
+            <rect width="230" height="28" rx="6" fill="#162032"/>
+            <text x="12" y="19" fill="#f8fafc" font-family="'JetBrains Mono'" font-weight="700" font-size="12">rfqs</text>
+            <text x="12" y="48" fill="#38bdf8" font-family="'JetBrains Mono'" font-size="11">PK id : integer</text>
+            <text x="12" y="68" fill="#818cf8" font-family="'JetBrains Mono'" font-size="11">FK buyer_id -> users.id</text>
+            <text x="12" y="88" fill="#94a3b8" font-family="'JetBrains Mono'" font-size="11">title : varchar(255)</text>
+            <text x="12" y="108" fill="#94a3b8" font-family="'JetBrains Mono'" font-size="11">origin / destination</text>
+            <text x="12" y="128" fill="#94a3b8" font-family="'JetBrains Mono'" font-size="11">baseline_price : numeric</text>
+            <text x="12" y="148" fill="#64748b" font-family="'JetBrains Mono'" font-size="11">weight, volume, cargo</text>
+          </g>
+
+          <!-- 3. auctions -->
+          <g transform="translate(610, 40)">
+            <rect width="250" height="210" rx="6" fill="#111827" stroke="#0284c7" stroke-width="2"/>
+            <rect width="250" height="28" rx="6" fill="rgba(56, 189, 248, 0.12)"/>
+            <text x="12" y="19" fill="#38bdf8" font-family="'JetBrains Mono'" font-weight="700" font-size="12">auctions (Core Engine)</text>
+            <text x="12" y="48" fill="#38bdf8" font-family="'JetBrains Mono'" font-size="11">PK id : integer</text>
+            <text x="12" y="68" fill="#818cf8" font-family="'JetBrains Mono'" font-size="11">FK rfq_id -> rfqs.id UQ</text>
+            <text x="12" y="88" fill="#94a3b8" font-family="'JetBrains Mono'" font-size="11">name : varchar(255)</text>
+            <text x="12" y="108" fill="#94a3b8" font-family="'JetBrains Mono'" font-size="11">status : DRAFT|ACTIVE|...</text>
+            <text x="12" y="128" fill="#38bdf8" font-family="'JetBrains Mono'" font-size="11">current_close_at : ts</text>
+            <text x="12" y="148" fill="#fb7185" font-family="'JetBrains Mono'" font-size="11">forced_close_at : ts</text>
+            <text x="12" y="168" fill="#94a3b8" font-family="'JetBrains Mono'" font-size="11">total_extensions : int</text>
+            <text x="12" y="188" fill="#818cf8" font-family="'JetBrains Mono'" font-size="11">FK current_l1_bid_id</text>
+          </g>
+
+          <!-- 4. auction_configurations -->
+          <g transform="translate(910, 40)">
+            <rect width="150" height="150" rx="6" fill="#111827" stroke="#1f293d" stroke-width="1.5"/>
+            <rect width="150" height="28" rx="6" fill="#162032"/>
+            <text x="12" y="19" fill="#f8fafc" font-family="'JetBrains Mono'" font-weight="700" font-size="11">auction_configs</text>
+            <text x="12" y="48" fill="#38bdf8" font-family="'JetBrains Mono'" font-size="11">PK id : integer</text>
+            <text x="12" y="68" fill="#818cf8" font-family="'JetBrains Mono'" font-size="11">FK auction_id UQ</text>
+            <text x="12" y="88" fill="#94a3b8" font-family="'JetBrains Mono'" font-size="10">trigger_window_mins</text>
+            <text x="12" y="108" fill="#94a3b8" font-family="'JetBrains Mono'" font-size="10">increment_mins</text>
+            <text x="12" y="128" fill="#94a3b8" font-family="'JetBrains Mono'" font-size="10">bid/rank/l1_triggers</text>
+          </g>
+
+          <!-- 5. bids -->
+          <g transform="translate(440, 350)">
+            <rect width="260" height="220" rx="6" fill="#111827" stroke="#0284c7" stroke-width="1.5"/>
+            <rect width="260" height="28" rx="6" fill="rgba(56, 189, 248, 0.12)"/>
+            <text x="12" y="19" fill="#38bdf8" font-family="'JetBrains Mono'" font-weight="700" font-size="12">bids (Supplier Quotes)</text>
+            <text x="12" y="48" fill="#38bdf8" font-family="'JetBrains Mono'" font-size="11">PK id : integer</text>
+            <text x="12" y="68" fill="#818cf8" font-family="'JetBrains Mono'" font-size="11">FK auction_id -> auctions</text>
+            <text x="12" y="88" fill="#818cf8" font-family="'JetBrains Mono'" font-size="11">FK supplier_id -> users</text>
+            <text x="12" y="108" fill="#34d399" font-family="'JetBrains Mono'" font-weight="700" font-size="11">total_amount : numeric</text>
+            <text x="12" y="128" fill="#34d399" font-family="'JetBrains Mono'" font-weight="700" font-size="11">transit_time_hours : num</text>
+            <text x="12" y="148" fill="#94a3b8" font-family="'JetBrains Mono'" font-size="11">base, bunker, thc, doc</text>
+            <text x="12" y="168" fill="#94a3b8" font-family="'JetBrains Mono'" font-size="11">valid_until : timestamp</text>
+            <text x="12" y="188" fill="#fbbf24" font-family="'JetBrains Mono'" font-size="11">rank : integer</text>
+            <text x="12" y="208" fill="#64748b" font-family="'JetBrains Mono'" font-size="11">submitted_at : ts</text>
+          </g>
+
+          <!-- 6. auction_extensions -->
+          <g transform="translate(770, 350)">
+            <rect width="240" height="150" rx="6" fill="#111827" stroke="#1f293d" stroke-width="1.5"/>
+            <rect width="240" height="28" rx="6" fill="#162032"/>
+            <text x="12" y="19" fill="#f8fafc" font-family="'JetBrains Mono'" font-weight="700" font-size="12">auction_extensions</text>
+            <text x="12" y="48" fill="#38bdf8" font-family="'JetBrains Mono'" font-size="11">PK id : integer</text>
+            <text x="12" y="68" fill="#818cf8" font-family="'JetBrains Mono'" font-size="11">FK auction_id -> auctions</text>
+            <text x="12" y="88" fill="#818cf8" font-family="'JetBrains Mono'" font-size="11">FK trigger_bid_id -> bids</text>
+            <text x="12" y="108" fill="#94a3b8" font-family="'JetBrains Mono'" font-size="11">old_close_at, new_close</text>
+            <text x="12" y="128" fill="#94a3b8" font-family="'JetBrains Mono'" font-size="11">extension_number : int</text>
+          </g>
+
+          <!-- 7. auction_activity -->
+          <g transform="translate(120, 350)">
+            <rect width="240" height="150" rx="6" fill="#111827" stroke="#1f293d" stroke-width="1.5"/>
+            <rect width="240" height="28" rx="6" fill="#162032"/>
+            <text x="12" y="19" fill="#f8fafc" font-family="'JetBrains Mono'" font-weight="700" font-size="12">auction_activity (Audit)</text>
+            <text x="12" y="48" fill="#38bdf8" font-family="'JetBrains Mono'" font-size="11">PK id : integer</text>
+            <text x="12" y="68" fill="#818cf8" font-family="'JetBrains Mono'" font-size="11">FK auction_id -> auctions</text>
+            <text x="12" y="88" fill="#818cf8" font-family="'JetBrains Mono'" font-size="11">FK user_id -> users</text>
+            <text x="12" y="108" fill="#94a3b8" font-family="'JetBrains Mono'" font-size="11">action_type : varchar</text>
+            <text x="12" y="128" fill="#94a3b8" font-family="'JetBrains Mono'" font-size="11">description, metadata_json</text>
+          </g>
+
+          <!-- Connections with Multiplicity -->
+          <!-- users to rfqs [1:N] -->
+          <line x1="240" y1="100" x2="310" y2="100" stroke="#64748b" stroke-width="1.5"/>
+          <text x="248" y="92" fill="#38bdf8" font-family="'JetBrains Mono'" font-weight="700" font-size="10">1</text>
+          <text x="290" y="92" fill="#94a3b8" font-family="'JetBrains Mono'" font-weight="700" font-size="10">1:N</text>
+
+          <!-- rfqs to auctions [1:1] -->
+          <line x1="540" y1="100" x2="610" y2="100" stroke="#38bdf8" stroke-width="2"/>
+          <text x="548" y="92" fill="#38bdf8" font-family="'JetBrains Mono'" font-weight="700" font-size="10">1</text>
+          <text x="592" y="92" fill="#38bdf8" font-family="'JetBrains Mono'" font-weight="700" font-size="10">1:1</text>
+
+          <!-- auctions to auction_configs [1:1] -->
+          <line x1="860" y1="100" x2="910" y2="100" stroke="#64748b" stroke-width="1.5"/>
+          <text x="868" y="92" fill="#38bdf8" font-family="'JetBrains Mono'" font-weight="700" font-size="10">1</text>
+          <text x="888" y="92" fill="#38bdf8" font-family="'JetBrains Mono'" font-weight="700" font-size="10">1:1</text>
+
+          <!-- auctions to bids [1:N] -->
+          <path d="M 670 250 L 670 300 L 570 300 L 570 350" fill="none" stroke="#38bdf8" stroke-width="2"/>
+          <text x="678" y="265" fill="#38bdf8" font-family="'JetBrains Mono'" font-weight="700" font-size="10">1</text>
+          <text x="578" y="340" fill="#94a3b8" font-family="'JetBrains Mono'" font-weight="700" font-size="10">1:N</text>
+
+          <!-- auctions to auction_extensions [1:N] -->
+          <path d="M 780 250 L 780 300 L 870 300 L 870 350" fill="none" stroke="#64748b" stroke-width="1.5"/>
+          <text x="788" y="265" fill="#38bdf8" font-family="'JetBrains Mono'" font-weight="700" font-size="10">1</text>
+          <text x="878" y="340" fill="#94a3b8" font-family="'JetBrains Mono'" font-weight="700" font-size="10">1:N</text>
+
+          <!-- auctions to auction_activity [1:N] -->
+          <path d="M 640 250 L 640 310 L 240 310 L 240 350" fill="none" stroke="#64748b" stroke-width="1.5"/>
+          <text x="648" y="265" fill="#38bdf8" font-family="'JetBrains Mono'" font-weight="700" font-size="10">1</text>
+          <text x="248" y="340" fill="#94a3b8" font-family="'JetBrains Mono'" font-weight="700" font-size="10">1:N</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Section 2: Table Definitions -->
+    <div class="section-head">
+      <div class="section-title">
+        <span class="section-num">2</span>
+        <h2>Table Definitions</h2>
+      </div>
+      <p class="section-desc">
+        Complete column specifications, PostgreSQL data types, and integrity rules.
+      </p>
+    </div>
+
+    <div class="spec-group">
+
+      <!-- Table: users -->
+      <div class="spec-card">
+        <div class="spec-header">
+          <span class="spec-title">users</span>
+          <span class="spec-desc">Central authentication and Role-Based Access Control (RBAC)</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Column</th>
+              <th>Type</th>
+              <th>Rules / Meaning</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-name">id</td>
+              <td class="col-type">Integer</td>
+              <td><span class="pill pill-pk">PK</span> Auto-incrementing primary key</td>
+            </tr>
+            <tr>
+              <td class="col-name">email</td>
+              <td class="col-type">String(255)</td>
+              <td><span class="pill pill-uq">UQ</span> <span class="pill pill-req">NOT NULL</span> User login identifier</td>
+            </tr>
+            <tr>
+              <td class="col-name">hashed_password</td>
+              <td class="col-type">String(255)</td>
+              <td><span class="pill pill-req">NOT NULL</span> Bcrypt salted password hash</td>
+            </tr>
+            <tr>
+              <td class="col-name">role</td>
+              <td class="col-type">String(50)</td>
+              <td><span class="pill pill-req">NOT NULL</span> <code>BUYER</code>, <code>SUPPLIER</code>, or <code>ADMIN</code> (governs RBAC access)</td>
+            </tr>
+            <tr>
+              <td class="col-name">full_name</td>
+              <td class="col-type">String(255)</td>
+              <td>User display name</td>
+            </tr>
+            <tr>
+              <td class="col-name">company_name</td>
+              <td class="col-type">String(255)</td>
+              <td>Organization name (shipper or supplier)</td>
+            </tr>
+            <tr>
+              <td class="col-name">is_active</td>
+              <td class="col-type">Boolean</td>
+              <td>Account status flag (default: true)</td>
+            </tr>
+            <tr>
+              <td class="col-name">created_at</td>
+              <td class="col-type">DateTime(UTC)</td>
+              <td>Account registration timestamp</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Table: auctions -->
+      <div class="spec-card">
+        <div class="spec-header">
+          <span class="spec-title">auctions</span>
+          <span class="spec-desc">Core auction lifecycle and dynamic close deadline management</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Column</th>
+              <th>Type</th>
+              <th>Rules / Meaning</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-name">id</td>
+              <td class="col-type">Integer</td>
+              <td><span class="pill pill-pk">PK</span> Auto-incrementing primary key</td>
+            </tr>
+            <tr>
+              <td class="col-name">rfq_id</td>
+              <td class="col-type">Integer</td>
+              <td><span class="pill pill-fk">FK</span> <span class="pill pill-uq">UQ</span> References <code>rfqs.id</code> (1:1 RFQ to auction mapping)</td>
+            </tr>
+            <tr>
+              <td class="col-name">name</td>
+              <td class="col-type">String(255)</td>
+              <td><span class="pill pill-req">NOT NULL</span> Unique among active auctions</td>
+            </tr>
+            <tr>
+              <td class="col-name">status</td>
+              <td class="col-type">String(50)</td>
+              <td><code>DRAFT</code>, <code>SCHEDULED</code>, <code>ACTIVE</code>, <code>EXTENDED</code>, <code>CLOSED</code>, <code>FORCE_CLOSED</code></td>
+            </tr>
+            <tr>
+              <td class="col-name">start_at</td>
+              <td class="col-type">DateTime(UTC)</td>
+              <td><span class="pill pill-req">NOT NULL</span> Scheduled start time when auction opens for bidding</td>
+            </tr>
+            <tr>
+              <td class="col-name">initial_close_at</td>
+              <td class="col-type">DateTime(UTC)</td>
+              <td><span class="pill pill-req">NOT NULL</span> Original planned close time prior to extensions</td>
+            </tr>
+            <tr>
+              <td class="col-name">current_close_at</td>
+              <td class="col-type">DateTime(UTC)</td>
+              <td><span class="pill pill-req">NOT NULL</span> Dynamically updated close time (extended by qualifying bids)</td>
+            </tr>
+            <tr>
+              <td class="col-name">forced_close_at</td>
+              <td class="col-type">DateTime(UTC)</td>
+              <td><span class="pill pill-req">NOT NULL</span> Hard close ceiling; extensions cannot push deadline past this</td>
+            </tr>
+            <tr>
+              <td class="col-name">total_extensions</td>
+              <td class="col-type">Integer</td>
+              <td>Count of dynamic extensions triggered (starts at 0)</td>
+            </tr>
+            <tr>
+              <td class="col-name">current_l1_bid_id</td>
+              <td class="col-type">Integer</td>
+              <td><span class="pill pill-fk">FK</span> References <code>bids.id</code> (current lowest qualified bid)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Table: bids -->
+      <div class="spec-card">
+        <div class="spec-header">
+          <span class="spec-title">bids</span>
+          <span class="spec-desc">Supplier freight quotes, fee breakdowns, transit days, and rank positions</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Column</th>
+              <th>Type</th>
+              <th>Rules / Meaning</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-name">id</td>
+              <td class="col-type">Integer</td>
+              <td><span class="pill pill-pk">PK</span> Auto-incrementing primary key</td>
+            </tr>
+            <tr>
+              <td class="col-name">auction_id</td>
+              <td class="col-type">Integer</td>
+              <td><span class="pill pill-fk">FK</span> References <code>auctions.id</code></td>
+            </tr>
+            <tr>
+              <td class="col-name">supplier_id</td>
+              <td class="col-type">Integer</td>
+              <td><span class="pill pill-fk">FK</span> References <code>users.id</code> (bidding supplier)</td>
+            </tr>
+            <tr>
+              <td class="col-name">base_fare</td>
+              <td class="col-type">Numeric(12,2)</td>
+              <td><span class="pill pill-req">NOT NULL</span> Pure ocean / road freight charge</td>
+            </tr>
+            <tr>
+              <td class="col-name">bunker_surcharge</td>
+              <td class="col-type">Numeric(12,2)</td>
+              <td>Fuel surcharge (BAF)</td>
+            </tr>
+            <tr>
+              <td class="col-name">terminal_handling</td>
+              <td class="col-type">Numeric(12,2)</td>
+              <td>Terminal handling charges (THC)</td>
+            </tr>
+            <tr>
+              <td class="col-name">doc_fee</td>
+              <td class="col-type">Numeric(12,2)</td>
+              <td>Documentation / customs filing fee</td>
+            </tr>
+            <tr>
+              <td class="col-name">total_amount</td>
+              <td class="col-type">Numeric(12,2)</td>
+              <td><span class="pill pill-req">NOT NULL</span> Landed sum: <code>base_fare + bunker + thc + doc_fee</code></td>
+            </tr>
+            <tr>
+              <td class="col-name">transit_time_hours</td>
+              <td class="col-type">Numeric(8,2)</td>
+              <td><span class="pill pill-req">NOT NULL</span> Transit duration. Primary tie-breaker for identical bids.</td>
+            </tr>
+            <tr>
+              <td class="col-name">valid_until</td>
+              <td class="col-type">DateTime(UTC)</td>
+              <td>Validity of quote expiration timestamp</td>
+            </tr>
+            <tr>
+              <td class="col-name">rank</td>
+              <td class="col-type">Integer</td>
+              <td>Computed position at submission time (1 for L1, 2 for L2, etc.)</td>
+            </tr>
+            <tr>
+              <td class="col-name">idempotency_key</td>
+              <td class="col-type">String(100)</td>
+              <td><span class="pill pill-uq">UQ</span> UUID preventing duplicate bid processing on network retry</td>
+            </tr>
+            <tr>
+              <td class="col-name">submitted_at</td>
+              <td class="col-type">DateTime(UTC)</td>
+              <td>Timestamp of quote ingestion. Second tie-breaker for ranking.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Table: auction_configurations -->
+      <div class="spec-card">
+        <div class="spec-header">
+          <span class="spec-title">auction_configurations</span>
+          <span class="spec-desc">Buyer-configured trigger window, extension increments, and conditions</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Column</th>
+              <th>Type</th>
+              <th>Rules / Meaning</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-name">id</td>
+              <td class="col-type">Integer</td>
+              <td><span class="pill pill-pk">PK</span> Auto-incrementing primary key</td>
+            </tr>
+            <tr>
+              <td class="col-name">auction_id</td>
+              <td class="col-type">Integer</td>
+              <td><span class="pill pill-fk">FK</span> <span class="pill pill-uq">UQ</span> References <code>auctions.id</code> (1:1 configuration mapping)</td>
+            </tr>
+            <tr>
+              <td class="col-name">trigger_window_minutes</td>
+              <td class="col-type">Integer</td>
+              <td>Minutes before close where qualifying bids trigger extension (default: 10)</td>
+            </tr>
+            <tr>
+              <td class="col-name">extension_increment_minutes</td>
+              <td class="col-type">Integer</td>
+              <td>Minutes added to deadline when qualifying quote is placed (default: 5)</td>
+            </tr>
+            <tr>
+              <td class="col-name">bid_change_trigger</td>
+              <td class="col-type">Boolean</td>
+              <td>Extend if any new bid arrives within trigger window</td>
+            </tr>
+            <tr>
+              <td class="col-name">rank_change_trigger</td>
+              <td class="col-type">Boolean</td>
+              <td>Extend if quote causes rank positions to shift</td>
+            </tr>
+            <tr>
+              <td class="col-name">l1_change_trigger</td>
+              <td class="col-type">Boolean</td>
+              <td>Extend if lowest bidder (L1) changes inside trigger window</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- Section 3: Data Integrity Invariants -->
+    <div class="section-head">
+      <div class="section-title">
+        <span class="section-num">3</span>
+        <h2>Data Integrity Invariants</h2>
+      </div>
+      <p class="section-desc">
+        Business invariants governing data consistency, concurrency, and deadlines.
+      </p>
+    </div>
+
+    <div class="grid-2">
+      <!-- Unique Active Auction Name -->
+      <div class="note-card">
+        <div class="note-tag">INVARIANT 01</div>
+        <div class="note-title">Unique Active Auction Names</div>
+        <div class="note-body">
+          Only one active or scheduled auction may exist with a given name at any time. When an auction is closed or completed, a new auction may reuse the name. This prevents buyer confusion and duplicate bidding rooms.
+        </div>
+      </div>
+
+      <!-- Single Supplier Same-Bid Guard -->
+      <div class="note-card">
+        <div class="note-tag">INVARIANT 02</div>
+        <div class="note-title">Single-Supplier Duplicate Quote Guard</div>
+        <div class="note-body">
+          A supplier cannot quote the exact same landed cost twice in the same auction. They must submit a lower rate or an improved commercial offer. Price ties between different suppliers are allowed and resolved by transit time.
+        </div>
+      </div>
+
+      <!-- Bounded Extension Rule -->
+      <div class="note-card">
+        <div class="note-tag">INVARIANT 03</div>
+        <div class="note-title">Forced Close Ceiling Guarantee</div>
+        <div class="note-body">
+          Auctions can never run indefinitely. The system guarantees that <code>forced_close_at > initial_close_at</code>, and every dynamic extension is strictly capped at: <code>min(current_close + increment, forced_close)</code>.
+        </div>
+      </div>
+
+      <!-- Role-Based Authorization Guard -->
+      <div class="note-card">
+        <div class="note-tag">INVARIANT 04</div>
+        <div class="note-title">Role-Based Data Isolation (RBAC)</div>
+        <div class="note-body">
+          The database schema isolates permissions: only users with <code>role = BUYER</code> can create RFQs and configure auctions. Only users with <code>role = SUPPLIER</code> can submit bids. The forced close ceiling is never exposed to supplier queries.
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <div>British Reverse Auction RFQ Platform · Database Schema Design</div>
+      <div>PostgreSQL Architecture Specification</div>
+    </footer>
+
+  </div>
+
+</body>
+</html>
