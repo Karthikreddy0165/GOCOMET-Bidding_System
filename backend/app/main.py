@@ -130,6 +130,46 @@ async def health_check():
     }
 
 
+# Architecture Deliverables: HLD and Schema Design Direct Serving
+docs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "docs"))
+
+
+@app.get("/hld.html", response_class=FileResponse, include_in_schema=False)
+@app.get("/hld", response_class=FileResponse, include_in_schema=False)
+@app.get("/docs/hld.html", response_class=FileResponse, include_in_schema=False)
+async def serve_hld():
+    for p in [
+        os.path.join(docs_dir, "hld.html"),
+        "/app/docs/hld.html",
+        "/app/static/hld.html",
+        "/app/static/docs/hld.html",
+        "docs/hld.html",
+    ]:
+        if os.path.exists(p):
+            return FileResponse(p, media_type="text/html")
+    raise HTTPException(status_code=404, detail="HLD specification not found")
+
+
+@app.get("/schema_design.html", response_class=FileResponse, include_in_schema=False)
+@app.get("/schema.html", response_class=FileResponse, include_in_schema=False)
+@app.get("/schema", response_class=FileResponse, include_in_schema=False)
+@app.get("/erd", response_class=FileResponse, include_in_schema=False)
+@app.get("/docs/schema_design.html", response_class=FileResponse, include_in_schema=False)
+@app.get("/docs/schema.html", response_class=FileResponse, include_in_schema=False)
+async def serve_schema():
+    for p in [
+        os.path.join(docs_dir, "schema_design.html"),
+        os.path.join(docs_dir, "schema.html"),
+        "/app/docs/schema_design.html",
+        "/app/static/schema_design.html",
+        "/app/static/docs/schema_design.html",
+        "docs/schema_design.html",
+    ]:
+        if os.path.exists(p):
+            return FileResponse(p, media_type="text/html")
+    raise HTTPException(status_code=404, detail="Schema design specification not found")
+
+
 # Static Frontend Serving & Single Page App Fallback (Production / Docker)
 static_dir = os.environ.get("STATIC_DIR", "/app/static")
 if not os.path.exists(static_dir):
@@ -142,18 +182,20 @@ if os.path.exists(static_dir):
     if os.path.exists(assets_dir):
         app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
 
+    @app.get("/", include_in_schema=False)
     @app.get("/{full_path:path}", include_in_schema=False)
-    async def serve_spa(full_path: str):
-        if full_path.startswith((
-            "docs", "redoc", "openapi.json", "auth", "rfqs", "auctions",
+    async def serve_spa(full_path: str = ""):
+        if full_path and full_path.startswith((
+            "redoc", "openapi.json", "auth", "rfqs", "auctions",
             "bids", "activity", "demo", "ws", "health"
         )):
             raise HTTPException(status_code=404, detail="Not Found")
-        target_file = os.path.join(static_dir, full_path)
-        if os.path.exists(target_file) and os.path.isfile(target_file):
-            return FileResponse(target_file)
+        if full_path:
+            target_file = os.path.join(static_dir, full_path)
+            if os.path.exists(target_file) and os.path.isfile(target_file):
+                return FileResponse(target_file)
         index_file = os.path.join(static_dir, "index.html")
         if os.path.exists(index_file):
             return FileResponse(index_file)
-        raise HTTPException(status_code=404, detail="Static index not found")
+        return {"status": "online", "message": "British Auction RFQ Platform API", "docs": "/docs"}
 
