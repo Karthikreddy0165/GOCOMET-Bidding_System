@@ -9,8 +9,8 @@ A real-time logistics freight procurement platform where freight buyers issue RF
 | Deliverable | Live Link |
 | :--- | :--- |
 | **Live Web Platform** | [https://gocomet-biddingsystem-production.up.railway.app](https://gocomet-biddingsystem-production.up.railway.app) |
-|  **High-Level Design (HLD)** | [https://htmlpreview.github.io/?https://github.com/Karthikreddy0165/GOCOMET-Bidding_System/blob/main/docs/hld.html](https://htmlpreview.github.io/?https://github.com/Karthikreddy0165/GOCOMET-Bidding_System/blob/main/docs/hld.html) |
-|  **Database Schema & ERD** | [https://htmlpreview.github.io/?https://github.com/Karthikreddy0165/GOCOMET-Bidding_System/blob/main/docs/schema_design.html]([https://gocomet-biddingsystem-production.up.railway.app/](https://htmlpreview.github.io/?https://github.com/Karthikreddy0165/GOCOMET-Bidding_System/blob/main/docs/)schema_design.html) |
+|  **High-Level Design (HLD)** | [View High-Level Design](https://htmlpreview.github.io/?https://github.com/Karthikreddy0165/GOCOMET-Bidding_System/blob/main/docs/hld.html) |
+|  **Database Schema & ERD** |  [View Schema Design for database tables](https://htmlpreview.github.io/?https://github.com/Karthikreddy0165/GOCOMET-Bidding_System/blob/main/docs/schema_design.html)  |
 
 > **Demo Credentials:** Buyer: `buyer@gocomet.com` · Supplier: `maersk@shipping.com` · Password: `password123`
 
