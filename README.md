@@ -4,24 +4,31 @@ A real-time logistics freight procurement platform where freight buyers issue RF
 
 ---
 
-## 🌐 Live Platform & Architecture Deliverables
+## 🌐 Live Platform, Videos & Engineering Deliverables
 
-| Deliverable | Live Link |
-| :--- | :--- |
-| **Live Web Platform** | [https://gocomet-biddingsystem-production.up.railway.app](https://gocomet-biddingsystem-production.up.railway.app) |
-|  **High-Level Design (HLD)** | [View High-Level Design](https://htmlpreview.github.io/?https://github.com/Karthikreddy0165/GOCOMET-Bidding_System/blob/main/docs/hld.html) |
-|  **Database Schema & ERD** |  [View Schema Design for database tables](https://htmlpreview.github.io/?https://github.com/Karthikreddy0165/GOCOMET-Bidding_System/blob/main/docs/schema_design.html)  |
+| Deliverable | Direct Live Link | Details / Alternate Mirror |
+| :--- | :--- | :--- |
+| 🚀 **Live Web Platform** | [gocomet-biddingsystem-production.up.railway.app](https://gocomet-biddingsystem-production.up.railway.app) | Production app hosted on Railway |
+| 🎥 **Live Application Demo Video** | [Watch Live Demo (YouTube)](https://youtu.be/FdMwy-v_FB8) | 3-minute comprehensive application walkthrough |
+| 🎥 **Engineering Overview Video** | [Watch Engineering Overview (YouTube)](https://youtu.be/oXrDYnVPnEI) | System architecture, HLD, and DB choices walkthrough |
+| 📐 **High-Level Design & Database Architecture** | [Open Interactive HLD & DB Specification](https://gocomet-biddingsystem-production.up.railway.app/hld.html) | [HTMLPreview Mirror](https://htmlpreview.github.io/?https://github.com/Karthikreddy0165/GOCOMET-Bidding_System/blob/main/docs/hld.html) |
+| 🗄️ **Database Schema & ERD Visualizer** | [Open Database Schema Visualizer](https://gocomet-biddingsystem-production.up.railway.app/schema_design.html) | [HTMLPreview Mirror](https://htmlpreview.github.io/?https://github.com/Karthikreddy0165/GOCOMET-Bidding_System/blob/main/docs/schema_design.html) |
 
 > **Demo Credentials:** Buyer: `buyer@gocomet.com` · Supplier: `maersk@shipping.com` · Password: `password123`
 
 ---
 
-## 📑 Local Documentation Files
+## 📑 Architectural & Technical Design Document
 
-Visual architecture and data model documentation are also checked into [`docs/`](./docs):
+The complete engineering design proposal, architectural data flows, and relational database schema are checked into [`docs/`](./docs):
 
-- **High-Level Design (HLD):** [`docs/hld.html`](./docs/hld.html) — System context, 5-stage procurement lifecycle, RBAC security, and concurrency guarantees.
-- **Database Schema Design:** [`docs/schema_design.html`](./docs/schema_design.html) — Relational ER diagram with explicit multiplicities (`1:1`, `1:N`), table definitions, and data integrity invariants.
+- **Interactive Specification Document:** [`docs/hld.html`](./docs/hld.html) / [`docs/schema_design.html`](./docs/schema_design.html)
+  - **Section 1–3:** Purpose, Scope, Functional (FR-01 to FR-17) and Non-Functional Requirements (NFR-01 to NFR-12).
+  - **Section 4:** Workload, Capacity & Traffic Assumptions (B2B sizing, peak bid throughput).
+  - **Section 5:** High-Level Design (HLD) & System Architecture SVG diagram.
+  - **Section 6:** Key Data Flows, 7-step bid transaction sequence, and WebSocket contracts.
+  - **Section 7:** Database Schema Design, Relational ERD SVG diagram with explicit multiplicities (`1:1`, `1:N`), table definitions, and constraints.
+  - **Section 8–9:** Key Design Decisions, Trade-offs, Open Product Questions, and Validation Checklist.
 
 ---
 
