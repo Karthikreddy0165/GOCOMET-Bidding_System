@@ -28,10 +28,10 @@ COPY --from=frontend-builder /app/frontend/dist /app/static
 WORKDIR /app/backend
 ENV PYTHONPATH=/app/backend
 ENV STATIC_DIR=/app/static
-ENV PORT=8000
+ENV PORT=8080
 
-EXPOSE 8000
+EXPOSE 8080
 
 # Seed demo data and launch uvicorn
-CMD ["sh", "-c", "python seed.py && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+CMD ["sh", "-c", "python seed.py && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8080}"]
 
