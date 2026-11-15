@@ -6,11 +6,11 @@ A real-time logistics freight procurement platform where freight buyers issue RF
 
 ## 🌐 Live Platform & Architecture Deliverables
 
-| Deliverable | Live Direct Link | GitHub Mirror |
-| :--- | :--- | :--- |
-| 🚀 **Live Web Platform** | [gocomet-biddingsystem-production.up.railway.app](https://gocomet-biddingsystem-production.up.railway.app) | Live Production App |
-| 📐 **High-Level Design (HLD)** | [Open HLD Interactive Specification](https://gocomet-biddingsystem-production.up.railway.app/hld.html) | [HTMLPreview Link](https://htmlpreview.github.io/?https://github.com/Karthikreddy0165/GOCOMET-Bidding_System/blob/main/docs/hld.html) |
-| 🗄️ **Database Schema & ERD** | [Open Database Schema Visualizer](https://gocomet-biddingsystem-production.up.railway.app/schema_design.html) | [HTMLPreview Link](https://htmlpreview.github.io/?https://github.com/Karthikreddy0165/GOCOMET-Bidding_System/blob/main/docs/schema_design.html) |
+| Deliverable | Live Link |
+| :--- | :--- |
+| 🚀 **Live Web Platform** | [https://gocomet-biddingsystem-production.up.railway.app](https://gocomet-biddingsystem-production.up.railway.app) |
+| 📐 **High-Level Design (HLD)** | [https://gocomet-biddingsystem-production.up.railway.app/hld.html](https://gocomet-biddingsystem-production.up.railway.app/hld.html) |
+| 🗄️ **Database Schema & ERD** | [https://gocomet-biddingsystem-production.up.railway.app/schema_design.html](https://gocomet-biddingsystem-production.up.railway.app/schema_design.html) |
 
 > **Demo Credentials:** Buyer: `buyer@gocomet.com` · Supplier: `maersk@shipping.com` · Password: `password123`
 
