@@ -8,9 +8,9 @@ A real-time logistics freight procurement platform where freight buyers issue RF
 
 | Deliverable | Live Link |
 | :--- | :--- |
-| 🚀 **Live Web Platform** | [https://gocomet-biddingsystem-production.up.railway.app](https://gocomet-biddingsystem-production.up.railway.app) |
-| 📐 **High-Level Design (HLD)** | [https://gocomet-biddingsystem-production.up.railway.app/hld.html](https://gocomet-biddingsystem-production.up.railway.app/hld.html) |
-| 🗄️ **Database Schema & ERD** | [https://gocomet-biddingsystem-production.up.railway.app/schema_design.html](https://gocomet-biddingsystem-production.up.railway.app/schema_design.html) |
+| **Live Web Platform** | [https://gocomet-biddingsystem-production.up.railway.app](https://gocomet-biddingsystem-production.up.railway.app) |
+|  **High-Level Design (HLD)** | [https://gocomet-biddingsystem-production.up.railway.app/hld.html](https://gocomet-biddingsystem-production.up.railway.app/hld.html) |
+|  **Database Schema & ERD** | [https://gocomet-biddingsystem-production.up.railway.app/schema_design.html](https://gocomet-biddingsystem-production.up.railway.app/schema_design.html) |
 
 > **Demo Credentials:** Buyer: `buyer@gocomet.com` · Supplier: `maersk@shipping.com` · Password: `password123`
 
