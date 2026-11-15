@@ -5,7 +5,7 @@ from typing import AsyncGenerator
 from app.config import settings
 
 engine = create_async_engine(
-    settings.DATABASE_URL,
+    settings.async_database_url,
     echo=False,
     pool_size=20,
     max_overflow=10,

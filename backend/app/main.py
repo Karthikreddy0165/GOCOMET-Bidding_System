@@ -1,10 +1,13 @@
 import asyncio
+import os
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 import logging
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from sqlalchemy import select, update
 
 from app.database import engine, Base, async_session_factory
@@ -125,4 +128,32 @@ async def health_check():
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "service": "british-auction-rfq-api",
     }
+
+
+# Static Frontend Serving & Single Page App Fallback (Production / Docker)
+static_dir = os.environ.get("STATIC_DIR", "/app/static")
+if not os.path.exists(static_dir):
+    local_dist = os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "dist")
+    if os.path.exists(local_dist):
+        static_dir = local_dist
+
+if os.path.exists(static_dir):
+    assets_dir = os.path.join(static_dir, "assets")
+    if os.path.exists(assets_dir):
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+
+    @app.get("/{full_path:path}", include_in_schema=False)
+    async def serve_spa(full_path: str):
+        if full_path.startswith((
+            "docs", "redoc", "openapi.json", "auth", "rfqs", "auctions",
+            "bids", "activity", "demo", "ws", "health"
+        )):
+            raise HTTPException(status_code=404, detail="Not Found")
+        target_file = os.path.join(static_dir, full_path)
+        if os.path.exists(target_file) and os.path.isfile(target_file):
+            return FileResponse(target_file)
+        index_file = os.path.join(static_dir, "index.html")
+        if os.path.exists(index_file):
+            return FileResponse(index_file)
+        raise HTTPException(status_code=404, detail="Static index not found")
 

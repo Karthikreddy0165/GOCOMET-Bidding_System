@@ -64,7 +64,9 @@ export const AuctionDetailPage: React.FC = () => {
     fetchSuppliersForBuyer();
 
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.hostname}:8000/ws/${id}?token=${token}`;
+    const defaultHost = window.location.port === '3000' ? `${window.location.hostname}:8000` : window.location.host;
+    const wsHost = (import.meta as any).env?.VITE_WS_HOST || defaultHost;
+    const wsUrl = `${protocol}//${wsHost}/ws/${id}?token=${token}`;
 
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;

@@ -21,7 +21,7 @@ from app.services.auth_service import hash_password
 
 logger = logging.getLogger("seed")
 
-engine = create_engine(settings.DATABASE_URL_SYNC, pool_pre_ping=True)
+engine = create_engine(settings.sync_database_url, pool_pre_ping=True)
 SessionLocal = sessionmaker(bind=engine)
 
 
