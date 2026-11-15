@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 import logging
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -177,6 +177,51 @@ if not os.path.exists(static_dir):
     if os.path.exists(local_dist):
         static_dir = local_dist
 
+
+@app.middleware("http")
+async def spa_navigation_middleware(request: Request, call_next):
+    """
+    Ensure browser refreshes and direct navigations on SPA routes
+    (e.g., /auctions, /auctions/:id, /rfqs, /login) return index.html.
+    API requests (e.g. from axios/fetch without text/html in Accept) pass through.
+    """
+    accept = request.headers.get("accept", "")
+    path = request.url.path
+
+    if request.method == "GET" and "text/html" in accept:
+        # Exempt API documentation and dedicated technical HTML deliverables
+        exempt_exact = {
+            "/docs",
+            "/redoc",
+            "/openapi.json",
+            "/hld.html",
+            "/hld",
+            "/docs/hld.html",
+            "/schema_design.html",
+            "/schema.html",
+            "/schema",
+            "/erd",
+            "/docs/schema_design.html",
+            "/docs/schema.html",
+            "/health",
+        }
+        if path in exempt_exact or path.startswith(("/assets", "/docs/")):
+            return await call_next(request)
+
+        # Check if an actual static file exists on disk (e.g. favicon.ico, images)
+        if os.path.exists(static_dir):
+            clean_path = path.lstrip("/")
+            candidate_file = os.path.join(static_dir, clean_path)
+            if clean_path and os.path.isfile(candidate_file) and not clean_path.endswith(".html"):
+                return await call_next(request)
+
+            index_file = os.path.join(static_dir, "index.html")
+            if os.path.exists(index_file):
+                return FileResponse(index_file, media_type="text/html")
+
+    return await call_next(request)
+
+
 if os.path.exists(static_dir):
     assets_dir = os.path.join(static_dir, "assets")
     if os.path.exists(assets_dir):
@@ -185,17 +230,12 @@ if os.path.exists(static_dir):
     @app.get("/", include_in_schema=False)
     @app.get("/{full_path:path}", include_in_schema=False)
     async def serve_spa(full_path: str = ""):
-        if full_path and full_path.startswith((
-            "redoc", "openapi.json", "auth", "rfqs", "auctions",
-            "bids", "activity", "demo", "ws", "health"
-        )):
-            raise HTTPException(status_code=404, detail="Not Found")
         if full_path:
             target_file = os.path.join(static_dir, full_path)
             if os.path.exists(target_file) and os.path.isfile(target_file):
                 return FileResponse(target_file)
         index_file = os.path.join(static_dir, "index.html")
         if os.path.exists(index_file):
-            return FileResponse(index_file)
+            return FileResponse(index_file, media_type="text/html")
         return {"status": "online", "message": "British Auction RFQ Platform API", "docs": "/docs"}
 
