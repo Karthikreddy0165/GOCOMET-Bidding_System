@@ -4,9 +4,21 @@ A real-time logistics freight procurement platform where freight buyers issue RF
 
 ---
 
-## 📑 System Documentation & Architecture Deliverables
+## 🌐 Live Platform & Architecture Deliverables
 
-Visual architecture and data model documentation are located in [`docs/`](./docs):
+| Deliverable | Live Direct Link | GitHub Mirror |
+| :--- | :--- | :--- |
+| 🚀 **Live Web Platform** | [gocomet-biddingsystem-production.up.railway.app](https://gocomet-biddingsystem-production.up.railway.app) | Live Production App |
+| 📐 **High-Level Design (HLD)** | [Open HLD Interactive Specification](https://gocomet-biddingsystem-production.up.railway.app/hld.html) | [HTMLPreview Link](https://htmlpreview.github.io/?https://github.com/Karthikreddy0165/GOCOMET-Bidding_System/blob/main/docs/hld.html) |
+| 🗄️ **Database Schema & ERD** | [Open Database Schema Visualizer](https://gocomet-biddingsystem-production.up.railway.app/schema_design.html) | [HTMLPreview Link](https://htmlpreview.github.io/?https://github.com/Karthikreddy0165/GOCOMET-Bidding_System/blob/main/docs/schema_design.html) |
+
+> **Demo Credentials:** Buyer: `buyer@gocomet.com` · Supplier: `maersk@shipping.com` · Password: `password123`
+
+---
+
+## 📑 Local Documentation Files
+
+Visual architecture and data model documentation are also checked into [`docs/`](./docs):
 
 - **High-Level Design (HLD):** [`docs/hld.html`](./docs/hld.html) — System context, 5-stage procurement lifecycle, RBAC security, and concurrency guarantees.
 - **Database Schema Design:** [`docs/schema_design.html`](./docs/schema_design.html) — Relational ER diagram with explicit multiplicities (`1:1`, `1:N`), table definitions, and data integrity invariants.
